@@ -1,0 +1,185 @@
+/* Navbar Customization */
+.navbar {
+    background-color: #ffffff; /* Warna latar navbar */
+    border-bottom: 2px solid #4caf50; /* Garis bawah berwarna hijau untuk konsistensi */
+    padding: 10px 20px; /* Ruang dalam untuk tampilan yang rapi */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Memberikan sedikit bayangan untuk depth */
+  }
+
+  .btn-light {
+    border: 1px solid #ccc; /* Border pada tombol User */
+  }
+
+  body {
+    background-color: #f5f5f5;
+  }
+
+  .card {
+    border: 2px solid #4caf50;
+  }
+
+  h1 {
+    font-size: 80px;
+  }
+
+  .nav-link {
+    font-size: 18px;
+  }
+
+  button {
+    font-size: 18px;
+  }
+
+  h5 {
+    font-size: 24px;
+  }
+
+  .display-1 {
+    font-size: 70px;
+  }
+
+  h6 {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+
+  .border-success {
+    border-color: #4caf50 !important;
+  }
+
+  .active {
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+    margin-left: 20px;
+  }
+
+  .active-sub {
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+    margin-left: 40px;
+  }
+
+  .sub {
+    color: white;
+    font-size: 20px;
+    font-weight: 0;
+    margin-left: 20px;
+  }
+
+  /* General styles */
+  body {
+    font-family: Arial, sans-serif;
+  }
+
+  /* Set consistent height for the border-success cards */
+  .card.border-success {
+    border: 2px solid #28a745; /* Green border */
+    height: 200px; /* Fixed height for uniformity */
+}
+
+/* Center text within cards */
+.card-title {
+    text-align: center;
+}
+
+.card h1 {
+    font-size: 48px; /* Adjusted font size */
+    margin-top: 10px;
+}
+
+/* Spacing adjustments */
+.card h5 {
+    margin-bottom: 20px; /* Space between title and content */
+}
+
+/* Custom styles for buttons */
+.btn-success {
+    background-color: #28a745; /* Green background */
+    border: none; /* Remove default border */
+    color: white; /* White text */
+}
+
+  /* Toggle switch styles */
+  .toggle-switch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px 0;
+  }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+  }
+
+  input:checked + .slider {
+    background-color: #4caf50;
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(26px);
+  }
+
+  /* Set a fixed height and make it scrollable */
+  .scrollable-content {
+    height: 150px; /* Set the height you desire */
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding: 10px; /* Add some padding for aesthetics */
+    border: 1px solid #28a745; /* Optional: add a border to match the theme */
+    border-radius: 5px; /* Optional: add border radius for rounded corners */
+    background-color: #ffffff; /* Background color for logs */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+  }
+
+  /* Style for log entries */
+  .log-entry {
+    padding: 5px;
+    border-bottom: 1px solid #e0e0e0; /* Divider between log entries */
+  }
+
+  .log-entry:last-child {
+    border-bottom: none; /* Remove the last border */
+  }
+
+  .log-entry p {
+    margin: 0; /* Remove default margin */
+  }
+
+  .log-entry span {
+    font-size: 12px; /* Smaller font for timestamps */
+    color: #999; /* Lighter color for timestamps */
+  }
