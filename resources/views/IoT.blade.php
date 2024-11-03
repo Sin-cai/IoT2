@@ -62,7 +62,7 @@
           <div class="col-md-4">
             <div class="card p-3 border-success">
               <h5 class="card-title">Temperatur</h5>
-              <h1 class="display-1">{{ optional($latestTemperature)->value1 ?? 0 }}°C</h1>
+              <h1 class="display-1">{{ optional($latestTemperature)->value ?? 0 }}°C</h1>
             </div>
           </div>
           
@@ -70,7 +70,7 @@
           <div class="col-md-4">
             <div class="card p-3 border-success">
               <h5 class="card-title">Pengaturan suhu Saat Ini</h5>
-              <h1 id="currentTemperature" class="display-1">{{ $value1 }}°C</h1>
+              <h1 id="currentTemperature" class="display-1">{{ $value  }}°C</h1>
             </div>
           </div>
           
@@ -158,126 +158,132 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const setButton = document.querySelector('.btn-success');
-    const temperatureDisplay = document.getElementById('currentTemperature');
-    const temperatureInput = document.getElementById('temperatureInput'); // Input field for the temperature
-    const deviceId = 'YOUR_DEVICE_ID'; // Replace with the actual device ID
-
-    // Event listener for Set Thermometer button
-    setButton.addEventListener('click', function() {
-        const newValue = temperatureInput.value;
-
-        // Send request to backend to update value1
-        fetch('/set-thermometer', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({
-                value1: newValue,
-                device_id: deviceId // Send devices_id with the request
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                alert(data.message);
-
-                // Update temperature display in Card 2 without refreshing
-                temperatureDisplay.innerHTML = `${newValue}°C`;
-
-                // Reset input field in Card 3
-                temperatureInput.value = ''; // Clear input field after successful submission
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const setButton = document.querySelector('.btn-success');
+      const temperatureDisplay = document.getElementById('currentTemperature');
+      const temperatureInput = document.getElementById('temperatureInput'); // Input field for the temperature
+      const deviceId = 1; // Replace with the actual device ID
+  
+      // Event listener for Set Thermometer button
+      setButton.addEventListener('click', function() {
+          const newValue = temperatureInput.value;
+  
+          if (newValue === '' || isNaN(newValue) || newValue < 0) {
+            alert('Please enter a valid temperature value.');
+            return;
+          }
+  
+          // Send request to backend to update value1
+          fetch('/set-thermometer', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+              },
+              body: JSON.stringify({
+                  value1: newValue,
+                  device_id: deviceId // Send devices_id with the request
+              })
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.message) {
+                  alert(data.message);
+  
+                  // Update temperature display in Card 2 without refreshing
+                  temperatureDisplay.innerHTML = `${newValue}°C`;
+  
+                  // Reset input field in Card 3
+                  temperatureInput.value = ''; // Clear input field after successful submission
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+          });
+      });
     });
-});
-
-
-</script>
-
-<script>
- document.addEventListener('DOMContentLoaded', function() {
-    const powerSwitch = document.getElementById('powerSwitch');
-    const logsContainer = document.getElementById('logsContainer');
-    const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const deviceId = 'YOUR_DEVICE_ID'; // Replace with actual device ID
-
-    // Function to update the switch based on the server status
-    function updatePowerSwitch(status) {
-        powerSwitch.checked = status === 1; // Set switch ON or OFF
-    }
-
-    // Polling function to check power status every 5 seconds
-    function pollPowerStatus() {
-        fetch(`/get-power-status`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({
-                device_id: deviceId // Send the devices_id to check status
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            updatePowerSwitch(data.status); // Update switch based on status from server
-            const logEntry = document.createElement('div');
-            logEntry.className = 'log-entry';
-            logEntry.innerHTML = `<p>Power is ${data.status === 1 ? 'ON' : 'OFF'} <span>- ${currentTime}</span></p>`;
-            logsContainer.appendChild(logEntry);
-            logsContainer.scrollTop = logsContainer.scrollHeight; // Auto-scroll to bottom
-        })
-        .catch(error => {
-            console.error('Error fetching power status:', error);
-        });
-    }
-
-    // Initial check when the page loads
-    pollPowerStatus();
-
-    // Set an interval to poll power status every 5 seconds
-    setInterval(pollPowerStatus, 5000); // 5000ms = 5 seconds
-
-    // Event listener for Power Switch toggle
-    powerSwitch.addEventListener('change', function() {
-        const powerStatus = this.checked ? 1 : 0; // 1 if ON, 0 if OFF
-
-        // Send a request to backend to update the power status
-        fetch(`/toggle-power`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({
-                status: powerStatus,
-                device_id: deviceId // Send devices_id to update status
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Add log entry for status change
-            const logEntry = document.createElement('div');
-            logEntry.className = 'log-entry';
-            logEntry.innerHTML = `<p>${data.status === 1 ? 'Power ON' : 'Power OFF'} <span>- ${currentTime}</span></p>`;
-            logsContainer.appendChild(logEntry);
-            logsContainer.scrollTop = logsContainer.scrollHeight; // Auto-scroll to bottom
-        })
-        .catch(error => {
-            console.error('Error updating power status:', error);
-        });
+  </script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const powerSwitch = document.getElementById('powerSwitch');
+      const logsContainer = document.getElementById('logsContainer');
+      const deviceId = 1; // Replace with actual device ID
+  
+      // Function to update the switch based on the server status
+      function updatePowerSwitch(status) {
+          powerSwitch.checked = status === 1; // Set switch ON or OFF
+      }
+  
+      // Polling function to check power status every 5 seconds
+      function pollPowerStatus() {
+          fetch(`/get-power-status?device_id=${deviceId}`, {
+              method: 'GET',
+              headers: {
+                  'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+              }
+          })
+          .then(response => response.json())
+          .then(data => {
+              updatePowerSwitch(data.status); // Update switch based on status from server
+  
+              // Get current time for logs
+              const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  
+              const logEntry = document.createElement('div');
+              logEntry.className = 'log-entry';
+              logEntry.innerHTML = `<p>Power is ${data.status === 1 ? 'ON' : 'OFF'} <span>- ${currentTime}</span></p>`;
+              logsContainer.appendChild(logEntry);
+              logsContainer.scrollTop = logsContainer.scrollHeight; // Auto-scroll to bottom
+          })
+          .catch(error => {
+              console.error('Error fetching power status:', error);
+          });
+      }
+  
+      // Initial check when the page loads
+      pollPowerStatus();
+  
+      // Set an interval to poll power status every 5 seconds
+      setInterval(pollPowerStatus, 5000); // 5000ms = 5 seconds
+  
+      // Event listener for Power Switch toggle
+      powerSwitch.addEventListener('change', function() {
+          const powerStatus = this.checked ? 1 : 0; // 1 if ON, 0 if OFF
+  
+          // Send a request to backend to update the power status
+          fetch(`/toggle-power`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+              },
+              body: JSON.stringify({
+                  status: powerStatus,
+                  device_id: deviceId // Send devices_id to update status
+              })
+          })
+          .then(response => response.json())
+          .then(data => {
+            console.log(data)
+              // Get current time for logs
+              const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  
+              // Add log entry for status change
+              const logEntry = document.createElement('div');
+              logEntry.className = 'log-entry';
+              logEntry.innerHTML = `<p>${data.status === 1 ? 'Power ON' : 'Power OFF'} <span>- ${currentTime}</span></p>`;
+              logsContainer.appendChild(logEntry);
+              logsContainer.scrollTop = logsContainer.scrollHeight; // Auto-scroll to bottom
+          })
+          .catch(error => {
+              console.error('Error updating power status:', error);
+          });
+      });
     });
-});
-
-</script>
+  </script>
+  
 
 
 

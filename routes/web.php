@@ -24,11 +24,11 @@ Route::get('/laporan/{device_id}', [SuhuController::class, 'getLaporanData']);
 
 
 Route::post('/update-power-status', [SuhuController::class, 'updatePowerStatus']);
+
 Route::post('/set-thermometer', [SuhuController::class, 'setThermometer']);
-
-
-Route::get('/get-power-status', [SuhuController::class, 'getPowerStatus']);
 Route::post('/toggle-power', [SuhuController::class, 'togglePower']);
+Route::get('/get-power-status', [SuhuController::class, 'getPowerStatus']);
+
 
 
 

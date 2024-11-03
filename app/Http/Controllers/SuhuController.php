@@ -11,12 +11,12 @@ class SuhuController extends Controller
     public function index()
     {
         // Ambil data suhu terbaru dari database
-        $latestTemperature = Things::latest()->first();
+        $latestTemperature = Things_data::latest()->first();
         $thing = Things::where('devices_id', 1)->first();
         
 
         // Pass data suhu ke view
-        return view('IoT', ['value1' => $thing->value1 ?? 0], compact('latestTemperature'));
+        return view('IoT', ['value' => $thing->value1 ?? 0], compact('latestTemperature'));
     }
 
     public function thing(){
@@ -132,50 +132,70 @@ public function getDataForChart()
 
     // Function untuk set thermometer value
     public function setThermometer(Request $request)
-{
-    // Update value1 based on devices_id provided in the request
-    $thing = Things::where('devices_id', $request->device_id)->first(); // Now dynamic
-    if ($thing) {
-        $thing->value1 = $request->value1;
-        $thing->save();
-
-        return response()->json([
-            'message' => 'Thermometer value updated successfully!'
+    {
+        $request->validate([
+            'value1' => 'required|numeric',
+            'device_id' => 'required|integer|exists:devices,id'
         ]);
+
+        $device = devices::find($request->device_id);
+
+        if ($device) {
+
+            foreach($device->things as $item){
+                $item->value_set = $request->input('value1');
+
+                $item->save();
+            }
+
+            return response()->json(['message' => 'Temperature set successfully.']);
+        }
+
+        return response()->json(['message' => 'Device not found.'], 404);
     }
 
-    return response()->json([
-        'message' => 'Device not found.'
-    ], 404);
-}
+    // Method to toggle the power status
+    public function togglePower(Request $request)
+    {
 
-public function getPowerStatus(Request $request)
-{
-    // Get the status based on the devices_id passed in the request
-    $thing = Things::where('devices_id', $request->device_id)->first();
-    if ($thing) {
-        return response()->json(['status' => $thing->status]);
-    }
-
-    return response()->json(['message' => 'Device not found'], 404);
-}
-
-public function togglePower(Request $request)
-{
-    // Update the status of the specific record based on devices_id
-    $thing = Things::where('devices_id', $request->device_id)->first();
-    if ($thing) {
-        $thing->status = $request->status;
-        $thing->save();
-
-        return response()->json([
-            'message' => 'Power status updated',
-            'status' => $thing->status
+        // return $request;
+        $request->validate([
+            'status' => 'required|boolean',
+            'device_id' => 'required|integer|exists:devices,id'
         ]);
+
+        $device = devices::find($request->device_id);
+
+        if ($device) {
+            
+            foreach($device->things as $item){
+                $item->status = $request->input('status');
+
+                $item->save();
+            }
+
+            return response()->json(['status' => $device->things[0]->status, 'message' => 'Power status updated.']);
+        }
+
+        return response()->json(['message' => 'Device not found.'], 404);
     }
 
-    return response()->json(['message' => 'Device not found'], 404);
-}
+    // Method to get the current power status
+    public function getPowerStatus(Request $request)
+    {
+        $request->validate([
+            'device_id' => 'required|integer|exists:devices,id'
+        ]);
+
+        $device = devices::find($request->device_id);
+
+
+        if ($device) {
+            return response()->json(['status' => $device->things[0]->status]);
+        }
+
+        return response()->json(['message' => 'Device not found.'], 404);
+    }
 
 
 public function getLaporanData($device_id)
