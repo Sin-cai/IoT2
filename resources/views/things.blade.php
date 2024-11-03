@@ -38,7 +38,7 @@
                   </li>
                   <li class="nav-item">
                     <a class="nav-link text-white" href="/things">
-                      <i class="bi bi-box-seam me-2"></i> Things
+                      <i class="bi bi-box-seam me-2"></i>  Things
                     </a>
                   </li>
                 </ul>
